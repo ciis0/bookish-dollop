@@ -1,0 +1,46 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
+  // as there is no CI in MRs here, we can create as many as we want :)
+  "prHourlyLimit": 0,
+  "customManagers": [
+    {
+      "customType": "regex", // https://docs.renovatebot.com/modules/manager/regex/
+      "managerFilePatterns": ["/^versions.sh$/"],
+      "matchStrings": ["[^#]+=\"(?<currentValue>.*?)\" # (?<depName>.*)(?:^|\r\n|\r|\n|$)"],
+      "depNameTemplate": "{{ depName }}",
+      "datasourceTemplate": "docker"
+    }
+  ],
+  "packageRules": [
+    {
+      "matchDatasources": ["docker"],
+      "matchPackageNames": [
+        "docker.elastic.co/**"
+      ],
+      "allowedVersions": "<{{add major 1}}"
+    },
+    {
+      "matchDatasources": ["docker"],
+      "matchPackageNames": [
+        "rabbitmq",
+        "redis"
+      ],
+      "versioning": "regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)-(?<compatibility>.*)$"
+    },
+    {
+      "matchDatasources": ["docker"],
+      "matchPackageNames": [
+        "rabbitmq"
+      ],
+      "allowedVersions": "/^{{major}}\\.{{minor}}.*-management$/"
+    },
+    {
+      "matchDatasources": ["docker"],
+      "matchPackageNames": [
+        "redis"
+      ],
+      "allowedVersions": "/^{{major}}\\.{{minor}}.*-alpine$/"
+    }
+  ]
+}
